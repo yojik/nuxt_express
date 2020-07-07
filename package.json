@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "nuxt build && nodemon -w server.js -w nuxt.config.js server.js",
+    "dev": "cross-env NODE_ENV=development && nodemon -w server.js -w nuxt.config.js server.js",
     "generate": "nuxt generate",
     "build": "nuxt build",
     "start": "nuxt start",
@@ -27,13 +27,12 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.0.1",
+    "cross-env": "^7.0.2",
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-nuxt": "^1.0.0",
-    "eslint-plugin-prettier": "^3.1.4",
     "jest": "^26.0.1",
     "nodemon": "^2.0.4",
-    "prettier": "^2.0.5",
     "vue-jest": "^3.0.4"
   }
 }

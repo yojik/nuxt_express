@@ -1,10 +1,10 @@
-//https://github.com/nuxt/nuxt.js/blob/dev/examples/with-sockets/nuxt.config.js
+// https://github.com/nuxt/nuxt.js/blob/dev/examples/with-sockets/nuxt.config.js
 module.exports = {
   /*
    ** Nuxt rendering mode
    ** See https://nuxtjs.org/api/configuration-mode
    */
-  mode: "spa",
+  mode: "universal",
   /*
    ** Nuxt target
    ** See https://nuxtjs.org/api/configuration-target

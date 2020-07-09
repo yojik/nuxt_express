@@ -1,0 +1,205 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Dev Example — Networked-Aframe</title>
+    <meta name="description" content="Dev Example — Networked-Aframe" />
+
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@a326cebe05da7541fb885ed0ce8e16facad7d5bd/dist/aframe-master.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js"></script>
+    <script src="/js/build.js"></script>
+    <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
+    <script src="https://unpkg.com/aframe-particle-system-component@1.0.5/dist/aframe-particle-system-component.min.js"></script>
+  </head>
+  <body>
+    <!-- WebXRのdom-overlayがinner frameではうまく動かないので、いったんコメントアウト-->
+    <!-- <div class="overlayStyle" id="overlay">
+      <h2>AR Sample</h2>
+      <button href="#" onclick='document.querySelector("#text").setAttribute("value","Title")'>Test</button>
+    </div> -->
+    <!-- <div class="overlayStyle" id="overlay">
+      <iframe src="/test.html"> </iframe>
+    </div> -->
+    <a-scene
+      networked-scene="room: dev; debug: true; adapter: socketio;"
+      webxr="optionalFeatures: dom-overlay; overlayElement: #overlay"
+      vr-mode-ui="enabled: true"
+    >
+      <a-assets>
+        <a-asset-item id="floor" src="/low_poly_isometric_rooms/scene.gltf" />
+
+        <img
+          id="grid"
+          src="https://img.gs/bbdkhfbzkk/stretch/https://i.imgur.com/25P1geh.png"
+          crossorigin="anonymous"
+        />
+        <img
+          id="sky"
+          src="https://i.imgur.com/WqlqEkq.jpg"
+          crossorigin="anonymous"
+        />
+
+        <!-- Templates -->
+
+        <!-- Avatar -->
+        <naf-template id="avatar-template">
+          <a-entity class="avatar">
+            <a-sphere
+              class="head"
+              color="#ffffff"
+              scale="0.45 0.5 0.4"
+            ></a-sphere>
+            <a-entity class="face" position="0 0.05 0">
+              <a-sphere
+                class="eye"
+                color="#efefef"
+                position="0.16 0.1 -0.35"
+                scale="0.12 0.12 0.12"
+              >
+                <a-sphere
+                  class="pupil"
+                  color="#000"
+                  position="0 0 -1"
+                  scale="0.2 0.2 0.2"
+                ></a-sphere>
+              </a-sphere>
+              <a-sphere
+                class="eye"
+                color="#efefef"
+                position="-0.16 0.1 -0.35"
+                scale="0.12 0.12 0.12"
+              >
+                <a-sphere
+                  class="pupil"
+                  color="#000"
+                  position="0 0 -1"
+                  scale="0.2 0.2 0.2"
+                ></a-sphere>
+              </a-sphere>
+            </a-entity>
+          </a-entity>
+        </naf-template>
+
+        <!-- /Templates -->
+      </a-assets>
+
+      <a-entity
+        id="player"
+        networked="template:#avatar-template;attachTemplateToLocal:false;"
+        camera
+        position="0 1.6 0"
+        wasd-controls
+        look-controls
+      >
+        <a-sphere class="head" visible="false" random-color></a-sphere>
+      </a-entity>
+
+      <a-entity
+        position="0 0 0"
+        geometry="primitive: plane; width: 10000; height: 10000;"
+        rotation="-90 0 0"
+        material="src: #grid; repeat: 10000 10000; transparent: true; metalness:0.6; roughness: 0.4; sphericalEnvMap: #sky;"
+      ></a-entity>
+
+      <a-entity
+        light="color: #ccccff; intensity: 1; type: ambient;"
+        visible=""
+      ></a-entity>
+      <a-entity
+        light="color: #ffaaff; intensity: 1.5"
+        position="5 5 5"
+      ></a-entity>
+
+      <a-gltf-model
+        position="0 0 -3.0"
+        scale="2 1 2"
+        src="#floor"
+      ></a-gltf-model>
+      <a-text
+        id="text"
+        position="-1 1.25 -3"
+        value="Hello, World!"
+        color="green"
+      ></a-text>
+
+      <a-sky src="#sky" rotation="0 -90 0"></a-sky>
+      <a-entity id="particles" particle-system="preset: snow"></a-entity>
+    </a-scene>
+
+    <style>
+      .overlayStyle {
+        position: absolute;
+        top: 0px;
+        z-index: 1;
+        width: 100px;
+        height: 100px;
+        background-color: #000;
+        color: green;
+        background-color: rgba(
+          0,
+          0,
+          0,
+          0.8
+        ); /* backgroundでalpha設定(4番目の引数) */
+      }
+      .overlayStyle iframe {
+        width: 100px;
+        height: 100px;
+      }
+
+      .github-corner:hover .octo-arm {
+        animation: octocat-wave 560ms ease-in-out;
+      }
+      @keyframes octocat-wave {
+        0%,
+        100% {
+          transform: rotate(0);
+        }
+        20%,
+        60% {
+          transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+          transform: rotate(10deg);
+        }
+      }
+      @media (max-width: 500px) {
+        .github-corner:hover .octo-arm {
+          animation: none;
+        }
+        .github-corner .octo-arm {
+          animation: octocat-wave 560ms ease-in-out;
+        }
+      }
+    </style>
+
+    <script>
+      // Define custom schema for syncing avatar color, set by random-color
+      NAF.schemas.add({
+        template: "#avatar-template",
+        components: [
+          "position",
+          "rotation",
+          {
+            selector: ".head",
+            component: "material",
+            property: "color"
+          }
+        ]
+      });
+
+      // Called by Networked-Aframe when connected to server
+      function onConnect() {
+        console.log("onConnect", new Date());
+      }
+
+      // On mobile remove elements that are resource heavy
+      var isMobile = AFRAME.utils.device.isMobile();
+
+      if (isMobile) {
+        var particles = document.getElementById("particles");
+        particles.parentNode.removeChild(particles);
+      }
+    </script>
+  </body>
+</html>
